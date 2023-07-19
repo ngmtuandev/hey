@@ -22,6 +22,7 @@ import asyncHandle from 'express-async-handler'
 //         } catch (error) {
 //             res.status(400).json({error})
 //         } hieu 3333333333333
+
 //     }
 
 const register = asyncHandle( async (req, res) => {
