@@ -2,7 +2,10 @@ import mongoose from "mongoose";
 import dotenv from 'dotenv'
 import cors from 'cors';
 import express from 'express'
-import UserRoute from './routes/UserRoute.js'
+import AuthRoute from './routes/AuthRoute.js'
+import UserRouter from './routes/UserRouter.js'
+import PostRouter from './routes/PostRouter.js'
+import CommentRouter from './routes/CommentRouter.js'
 import connectMogoose from "./connectmogoose.js";
 mongoose.set('strictQuery', false);
 
@@ -15,7 +18,10 @@ app.use(express.urlencoded({extended: true}))
 
 connectMogoose()
 
-app.use('/nguoidung', UserRoute)
+app.use('/', AuthRoute)
+app.use('/nguoidung', UserRouter)
+app.use('/bai-dang', PostRouter)
+app.use('/binh-luan', CommentRouter)
 
 app.listen(process.env.PORT, () => {
     console.log(`Connecting to ${process.env.PORT} Successfully`)
