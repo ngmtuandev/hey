@@ -10,5 +10,6 @@ router.put('/chinh-sua-bai-dang/:id', verifyToken,  PostController.updatePost)
 router.delete('/xoa-bai-viet/:id', verifyToken,  PostController.deletePost)
 router.get('/', verifyToken,  PostController.getTimeLinePost)
 router.put('/thich-bai-viet/:id', verifyToken,  PostController.likePost)
+router.get('/bai-viet/:id', PostController.getOnePost)
 
 export default router

@@ -1,19 +1,21 @@
+import mongoose from "mongoose";
 import PostModel from "../model/Post.js";
 import UserModel from "../model/User.js";
 
 const PostController = {
     createPost: async (req, res) => {
         try {
-            const userPost = await UserModel.findById(req.datatoken.id)
-            const newPost = await PostModel.create({...req.body, userpost: userPost._id})
-            console.log(newPost)
+            const userID = mongoose.Types.ObjectId(req.datatoken.id)
+            // const userPost = await UserModel.findById(userID)
+            const newPost = await PostModel.create({...req.body, user: userID})
+            console.log('new posttt : ', newPost)
             if (!newPost) {
                 res.status(401).json({status: 'Khong thể tạo bài đăng'})
             }
             else {
+
                 res.status(200).json({
-                    status: 'Tạo bài đăng thành công',
-                    data: {newPost, userPost}                
+                    newPost
                 })
             }
         } catch (error) {
@@ -24,7 +26,7 @@ const PostController = {
     },
     getUserPost: async (req, res) => {
         try {
-            const userPosts = await PostModel.find({userpost: req.params.id})
+            const userPosts = await PostModel.find({user: req.params.id}).populate('user')
             res.status(200).json({
                 status: 'Lấy người dùng thành công',
                 data: userPosts
@@ -54,11 +56,13 @@ const PostController = {
     deletePost: async (req, res) => {
         try {
             const post = await PostModel.findById(req.params.id)
+            console.log(post)
             if (!post) {
                 res.status(404).json({status: 'Không tồn tại bài viết này'})
             }
             else {
-                if (post?.userpost.toString() === req.datatoken.id) {
+                // console.log('first')
+                if (post?.user.toString() === req.datatoken.id) {
                     await PostModel.findByIdAndDelete(req.params.id)
                     res.status(200).json({
                         status: 'Xóa người dùng thành công'
@@ -79,20 +83,20 @@ const PostController = {
     },
     getTimeLinePost: async (req, res) => {
         try {
-            const userCurrent = await UserModel.findById(req.datatoken.id)
-            
-            if (userCurrent) {
-                const postUserCurrent = await PostModel.find({userpost : userCurrent._id})
-
-                const getAllPost = await PostModel.find({})
-                console.log(getAllPost)
-                const postUserCurrentFollowing = getAllPost?.filter((post) => userCurrent.following.includes(post?.userpost))
+                const userCurrent = await UserModel.findById(req.datatoken.id)
+                const postUserCurrent = await PostModel.find({user : userCurrent._id}).populate("user")
+                console.log('postUserCurrent', postUserCurrent)
+                const getAllPost = await PostModel.find({}).populate("user")
+                console.log('get all post', getAllPost)
+                const postUserCurrentFollowing = getAllPost?.filter((post) => 
+                    {
+                        return userCurrent.following.includes(post?.user?._id)
+                    }
+                )
                 
                 let dataTimeLinePost = postUserCurrent.concat(...postUserCurrentFollowing)
-
                 res.status(200).json({dataTimeLinePost})
 
-            }
             
 
         } catch (error) {
@@ -125,6 +129,22 @@ const PostController = {
 
         } catch (error) {
             res.status(401).json({status: 'Lỗi'})
+        }
+    },
+    getOnePost: async (req, res) => {
+        try {
+            const idPost = req.params.id
+            const findPostID = await PostModel.findById(idPost).populate('user')
+
+            if (!findPostID) {
+                res.status(404).json({status: 'Không tìm thấy bài viết'})
+            }
+            else {
+                res.status(200).json({findPostID})
+            }
+
+        } catch (error) {
+            res.status(401).json(error)
         }
     }
 }

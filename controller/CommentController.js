@@ -3,8 +3,7 @@ import CommentModel from '../model/Comment.js'
 const commentController = {
     createComment: async (req, res) => {
         try {
-            const newComment = await (await CommentModel.create({...req.body, user: req.datatoken.id}))
-            .populate('user', '-password')
+            const newComment = await (await CommentModel.create({...req.body, user: req.datatoken.id})).populate('user')
 
             res.status(201).json({newComment})
 
@@ -64,7 +63,7 @@ const commentController = {
     },
     getAllCommentInOnePost: async (req, res) => {
         try {
-            const allCommentInOnePost = await CommentModel.find({post: req.params.id})
+            const allCommentInOnePost = await CommentModel.find({post: req.params.id}).populate('user')
             res.status(200).json({data: allCommentInOnePost})
         } catch (error) {
             res.status(401).json({status: 'Lỗi'})
