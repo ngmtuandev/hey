@@ -9,7 +9,7 @@ function App() {
     <div>
       {token ? <Navbar></Navbar> : ''}
       <Routes>
-        <Route path={path.HOME} element={<Home></Home>}></Route>
+        <Route path={path.HOME} element={token ? <Home></Home> : <Signup></Signup>}></Route>
         <Route path={path.LOGIN} element={<Login></Login>}></Route>
         <Route path={path.SIGNUP} element={<Signup></Signup>}></Route>
         <Route path={path.UPLOAD} element={<Upload></Upload>}></Route>
